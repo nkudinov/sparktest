@@ -1,14 +1,18 @@
+
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
 
 object Main extends App{
-  val spark = SparkSession.builder.config("spark.sql.warehouse.dir", "file:///c:/tmp/spark-warehouse").config("spark.sql.codegen.wholeStage", "false").appName("Main").master("local[5]").getOrCreate
+  val spark = SparkSession.builder.config("spark.sql.warehouse.dir", "file:///c:/tmp/spark-warehouse").config("spark.sql.codegen.wholeStage", "false").appName("MainApplication Demo").master("local[5]").getOrCreate
+
+  val schema = new StructType(Array( StructField("id",LongType) , StructField("name", StringType)))
 
   spark.read
        .format("NewFormat")
-       .schema(new StructType())
+       .schema(schema)
        .load()
-       .explain()
+       .show()
 
-  println("finish")
+Thread.sleep(100000L)
+
 }

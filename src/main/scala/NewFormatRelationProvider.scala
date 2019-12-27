@@ -4,22 +4,12 @@ import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.sql.sources.{BaseRelation, DataSourceRegister, Filter, PrunedFilteredScan, SchemaRelationProvider}
 import org.apache.spark.sql.types.StructType
 
-class NewFormatRelationProvider extends DataSourceRegister with SchemaRelationProvider{
-  override def shortName(): String = "NewFormat"
+class NewFormatRelationProvider extends DataSourceRegister with SchemaRelationProvider {
+  override def shortName(): String = NewFormatRelationProvider.SHORT_NAME
 
-  override def createRelation(_sqlContext: SQLContext, parameters: Map[String, String], _schema: StructType): BaseRelation = {
-    new BaseRelation with PrunedFilteredScan {
-      override def sqlContext: SQLContext = _sqlContext
+  override def createRelation(sqlContext: SQLContext, parameters: Map[String, String], schema: StructType): BaseRelation = new NewFormatRelation( sqlContext, schema)
 
-      override def schema: StructType = _schema
-
-      override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
-        new RDD[Row](sqlContext.sparkContext, Nil) {
-          override def compute(split: Partition, context: TaskContext): Iterator[Row] = ???
-
-          override protected def getPartitions: Array[Partition] = ???
-        }
-      }
-    }
-  }
+}
+object NewFormatRelationProvider{
+  val SHORT_NAME = "NewFormat"
 }
