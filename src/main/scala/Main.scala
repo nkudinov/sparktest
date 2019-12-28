@@ -13,6 +13,8 @@ object Main extends App{
        .load()
        .show()
 
-Thread.sleep(100000L)
+  import spark.implicits._
 
+  val fdf = spark.sqlContext.createDataset(new FibonacciRDD(spark.sparkContext,10))
+  fdf.show()
 }
