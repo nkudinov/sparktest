@@ -10,20 +10,19 @@ object SApp extends App {
     spark.sparkContext.textFile(getClass.getResource( fileName).getFile)
   }
 
-  case class IntRecord(col1:Int, col2:Int, col3:Int,col4:Int,col5:Int)
+  case class Record5(col1:Int, col2:Int, col3:Int,col4:Int,col5:Int)
 
   def isInt(s:String) = {
       s forall Character.isDigit
   }
+  def getIntValue(arr:Array[Int],i:Int):Int = {
+    if (i >= arr.size) 0 else arr(i)
+  }
 
-  def parseAndFilter(rdd:RDD[String]):RDD[IntRecord] ={
-    rdd.map{
-      line => val arr = line.split(" "); (arr(0),arr(1),arr(2),arr(3),arr(4))
-    }.filter {
-      e => isInt(e._1) && isInt(e._2) && isInt(e._3) && isInt(e._4) && isInt(e._5)
-    }.map{
-      e => IntRecord( e._1.toInt,e._2.toInt,e._3.toInt,e._4.toInt,e._5.toInt)
-    }
+  def parseAndFilter(rdd:RDD[String]):RDD[Record5] ={
+    rdd.map(_.split(" ").filter(isInt).map(_.toInt))
+       .map(e => Record5(getIntValue(e,0),getIntValue(e,1),getIntValue(e,2),getIntValue(e,3),getIntValue(e,4)))
+
   }
 
   val rdd1 = parseAndFilter( RDDFromResourceFile(spark, "file1.txt"))
@@ -33,6 +32,7 @@ object SApp extends App {
 
   import spark.implicits._
   val ds = spark.createDataset(both)
+  ds.show()
 
   ds.groupBy().avg("col1","col2","col3","col4","col5").show()
 
